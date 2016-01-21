@@ -23,7 +23,6 @@ public class MySqrt {
 		}
 		
 		double mid = (min + max)/2;
-		
 		while (Math.abs(mid * mid - x) >= epsilon) {
 			mid = (min + max)/2;
 			
@@ -32,10 +31,8 @@ public class MySqrt {
 			} else {
 				min = mid;
 			}
-		}
-		
+		}		
 		return mid;
-
 	}
 
 	/**
@@ -57,22 +54,19 @@ public class MySqrt {
 			min = 1;
 			max = x;
 		}
-		
 		return mySqrtRecurse(x, epsilon, min, max);
-
 	}
 	
 	/**
-	 * Wrapper method for mySqrtRecurse
+	 * Wrapper method for mySqrtRecurse.
 	 * @param x The value to take the square root of.
 	 * @param epsilon The allowed margin of error.
-	 * @param min Lower bound of the interval which contains the correct value
-	 * @param max Upper bound of the interval which contains the correct value
+	 * @param min Lower bound of the interval which contains the correct value.
+	 * @param max Upper bound of the interval which contains the correct value.
 	 * @return The square root of x, approximated to within the margin of error.
 	 */
 	private static double mySqrtRecurse(double x, double epsilon, double min, double max) {
 		double mid = (min + max)/2;
-		double debug = Math.abs(mid * mid - x);
 		
 		if (Math.abs(mid * mid - x) < epsilon) {
 			return mid;
@@ -103,17 +97,17 @@ public class MySqrt {
 			double loopValue = mySqrtLoop(value, EPSILON);
 			double recurseValue = mySqrtRecurse(value, EPSILON);
 			
-			System.out.println();
-			System.out.println();
-			System.out.println("Testing value " + value + ". Correct root is " + correctValue + ".");
+			System.out.println("\nTesting value " + value + ". Correct root is " + correctValue + ".");
 			
-			if (!(Math.abs(loopValue - correctValue) >= EPSILON)) {
+			//Test mySqrtLoop()
+			if (!(loopValue * loopValue - value >= EPSILON)) {
 				System.out.println("mySqrtLoop passed, with result: " + loopValue);
 			} else {
 				System.out.println("########## mySqrtLoop failed, with result: " + loopValue);	
 			}
 			
-			if (!(Math.abs(recurseValue - correctValue) >= EPSILON)) {
+			//Test mySqrtRecurse()
+			if (!(Math.abs(recurseValue * recurseValue - value) >= EPSILON)) {
 				System.out.println("mySqrtRecurse passed, with result: " + recurseValue);
 			} else {
 				System.out.println("########## mySqrtRecurse failed, with result: " + recurseValue);	
