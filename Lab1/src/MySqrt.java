@@ -23,12 +23,15 @@ public class MySqrt {
 		}
 		
 		double mid = (min + max)/2;
+		//Shrink interval while difference bigger than epsilon
 		while (Math.abs(mid * mid - x) >= epsilon) {
 			mid = (min + max)/2;
-			
+						
 			if (mid * mid > x) {
+				//keep lower bound
 				max = mid;
 			} else {
+				//keep upper bound
 				min = mid;
 			}
 		}		
@@ -58,7 +61,7 @@ public class MySqrt {
 	}
 	
 	/**
-	 * Wrapper method for mySqrtRecurse.
+	 * Helper method for mySqrtRecurse.
 	 * @param x The value to take the square root of.
 	 * @param epsilon The allowed margin of error.
 	 * @param min Lower bound of the interval which contains the correct value.
@@ -72,8 +75,10 @@ public class MySqrt {
 			return mid;
 		} else {
 			if (mid * mid > x) {
+				//keep lower bound
 				return mySqrtRecurse(x, epsilon, min, mid);
 			} else {
+				//keep upper bound
 				return mySqrtRecurse(x, epsilon, mid, max);
 			}
 		}
