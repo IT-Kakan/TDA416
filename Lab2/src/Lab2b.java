@@ -11,7 +11,7 @@ public class Lab2b {
 			list.addLast(poly[i]);
 			
 			//If x-coordinate, add to queue
-			if (i % 2 == 0) {
+			if (i > 2 && i < poly.length-2 && i % 2 == 0) {
 				queue.add(list.getLast());
 			}
 		}
