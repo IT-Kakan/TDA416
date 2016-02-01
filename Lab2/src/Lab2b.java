@@ -5,14 +5,39 @@ public class Lab2b {
 
 	public static double[] simplifyShape(double[] poly, int k) { 		
 		DLList<Double> list = new DLList<Double>();
-		for (double d : poly) {
-			list.addLast(d);
-		}
-		
 		PriorityQueue<DLList<Double>.Node> queue = new PriorityQueue<>(new NodeComparator());
 		
+		for (int i = 0; i < poly.length; i++) {
+			list.addLast(poly[i]);
+			
+			//If x-coordinate, add to queue
+			if (i % 2 == 0) {
+				queue.add(list.getLast());
+			}
+		}
 		
-		return new double[8];
+		for (; k > 0; k--) {
+			DLList<Double>.Node toRemove = queue.poll();
+			
+			//Remove x- and y-coordinates from list
+			list.remove(toRemove);
+			list.remove(toRemove.next);
+			
+			//Remove and re-add previous point from queue
+			queue.remove(toRemove.prev);
+			queue.add(toRemove.prev);
+			queue.remove(toRemove.next);
+			queue.add(toRemove.next);
+		}
+		
+		double[] toReturn = new double[2*k];
+		for (int i = 0; i < toReturn.length; i++) {
+			DLList<Double>.Node toAdd = list.getFirst();
+			toReturn[i] = toAdd.elt;
+			list.remove(toAdd);
+		}
+				
+		return toReturn;
 	}
 	
 	/**
