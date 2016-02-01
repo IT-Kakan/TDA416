@@ -44,7 +44,22 @@ public class DLList<E> {
    * @return    the node holding the added element
    */
   public Node addFirst(E e) {
-	  return insertBefore(e, first);
+	  if (first == null) {
+		  Node newNode = new Node(e);
+		  
+		  first = newNode;
+		  newNode.prev = null;
+		  
+		  if (last == null) {
+			  last = first;
+		  } else {
+			  newNode.next = last;
+		  }
+		  
+		  return newNode;
+	  } else {
+		  return insertBefore(e, first);
+	  }
   }
 
   /** inserts an element at then end of the list
@@ -52,7 +67,22 @@ public class DLList<E> {
    * @return    the node holding the added element
    */
   public Node addLast(E e) {
-	  return insertAfter(e, last);
+	  if (last == null) {
+		  Node newNode = new Node(e);
+		  
+		  last = newNode;
+		  newNode.next = null;
+		  
+		  if (first == null) {
+			  first = last;
+		  } else {
+			  newNode.prev = first;
+		  }
+		  
+		  return newNode;
+	  } else {
+		  return insertAfter(e, last);
+	  }
   }
   
   /**
@@ -79,7 +109,14 @@ public class DLList<E> {
 	  
 	  newNode.prev = l;
 	  newNode.next = l.next;
-	  l.next.prev = newNode;
+	  
+	  if (l != last) {
+		  l.next.prev = newNode;
+	  } else {
+		  last = newNode;
+		  
+	  }
+	  
 	  l.next = newNode;
 	  
 	  return newNode;
@@ -95,7 +132,13 @@ public class DLList<E> {
 	  
 	  newNode.prev = l.prev;
 	  newNode.next = l;
-	  l.prev.next = newNode;
+	  
+	  if (l != first) {
+		  l.prev.next = newNode;
+	  } else {
+		  first = newNode;
+	  }
+	  
 	  l.prev = newNode;
 	  
 	  return newNode;
