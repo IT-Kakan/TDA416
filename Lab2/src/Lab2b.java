@@ -4,7 +4,7 @@ import java.util.PriorityQueue;
 public class Lab2b {
 
 	public static double[] simplifyShape(double[] poly, int k) { 		
-		DLList list = new DLList<Double>();
+		DLList<Double> list = new DLList<Double>();
 		for (double d : poly) {
 			list.addLast(d);
 		}
@@ -14,13 +14,26 @@ public class Lab2b {
 		
 		return new double[8];
 	}
-
+	
+	/**
+	 * Compares Nodes on their significance value.
+	 */
 	private static class NodeComparator implements Comparator<DLList<Double>.Node> {
+		
+		/**
+		 * @inheritDoc
+		 */
 		@Override
 		public int compare(DLList<Double>.Node arg0, DLList<Double>.Node arg1) {
 			return (int)(calculateSignificance(arg0) - calculateSignificance(arg1));
 		}
 
+		/**
+		 * Calculates the significance of the given Node by adding the distance to the previous and next node
+		 * and subtracting the distance between the left and the right node.
+		 * @param node The Node to calculate the significance of.
+		 * @return the significance
+		 */
 		private double calculateSignificance(DLList<Double>.Node node) {
 			double leftX = node.prev.prev.elt;
 			double leftY = node.prev.elt;
