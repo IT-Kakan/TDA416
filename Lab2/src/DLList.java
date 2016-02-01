@@ -44,11 +44,7 @@ public class DLList<E> {
    * @return    the node holding the added element
    */
   public Node addFirst(E e) {
-	  first.prev = new Node(e);
-	  first.prev.next = first;
-	  first = first.prev;
-      // TODO
-	  return new Node();
+	  return insertBefore(e, first);
   }
 
   /** inserts an element at then end of the list
@@ -56,24 +52,21 @@ public class DLList<E> {
    * @return    the node holding the added element
    */
   public Node addLast(E e) {
-      // TODO
-	  return new Node();
+	  return insertAfter(e, last);
   }
   
   /**
    * @return    the node of the list's first element, null if list is empty
    */
   public Node getFirst() {
-      // TODO
-	  return new Node();
+	  return first;
   }
   
   /**
    * @return    the node of the list's last element, null if list is empty
    */
   public Node getLast() {
-      // TODO
-	  return new Node();
+	  return last;
   }
   
   /** inserts a new element after a specified node
@@ -82,8 +75,14 @@ public class DLList<E> {
     * @return    the node holding the inserted element
     */
   public Node insertAfter(E e, Node l) {
-      // TODO
-	  return new Node();
+	  Node newNode = new Node(e);
+	  
+	  newNode.prev = l;
+	  newNode.next = l.next;
+	  l.next.prev = newNode;
+	  l.next = newNode;
+	  
+	  return newNode;
   }
 
   /** inserts a new element before a specified node
@@ -92,14 +91,25 @@ public class DLList<E> {
     * @return    the node holding the inserted element
     */
   public Node insertBefore(E e, Node l) {
-      // TODO
-	  return new Node();
+	  Node newNode = new Node(e);
+	  
+	  newNode.prev = l.prev;
+	  newNode.next = l;
+	  l.prev.next = newNode;
+	  l.prev = newNode;
+	  
+	  return newNode;
   }
 
   /** removes an element
     * @param l   then node containing the element that will be removed, must be non-null and a node belonging to this list
     */
   public void remove(Node l) {
-      // TODO
+      if (l.prev != null) {
+    	  l.prev.next = l.next;
+      }
+      if (l.next != null) {
+    	  l.next.prev = l.prev;
+      }
   }
 }
