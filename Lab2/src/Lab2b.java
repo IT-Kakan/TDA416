@@ -3,26 +3,21 @@ import java.util.PriorityQueue;
 
 public class Lab2b {
 
-	public static double[] simplifyShape(double[] poly, int k) { 		
+	public static double[] simplifyShape(double[] poly, int k) {
 		DLList<Double> list = new DLList<Double>();
 		PriorityQueue<DLList<Double>.Node> queue = new PriorityQueue<>(new NodeComparator());
 		
 		for (double d : poly) {
 			list.addLast(d);
-			/*
-			//If x-coordinate, add to queue
-			if (i > 2 && i < poly.length-2 && i % 2 == 0) {
-				queue.add(list.getLast());
-			}*/
 		}
 		
-		DLList<Double>.Node node = list.getFirst().next;
-		while(node.next != null) {
+		DLList<Double>.Node node = list.getFirst().next.next;
+		while (node.next.next != null) {
 			queue.add(node);
-			node = node.next;
+			node = node.next.next;	
 		}
 		
-		for (; k > 0; k--) {
+		while (queue.size()+2 > k){
 			DLList<Double>.Node toRemove = queue.poll();
 			
 			//Remove x- and y-coordinates from list
@@ -30,10 +25,15 @@ public class Lab2b {
 			list.remove(toRemove.next);
 			
 			//Remove and re-add previous point from queue
-			queue.remove(toRemove.prev);
-			queue.add(toRemove.prev);
-			queue.remove(toRemove.next);
-			queue.add(toRemove.next);
+			if (toRemove.prev.prev != list.getFirst()) {
+				queue.remove(toRemove.prev.prev);
+				queue.add(toRemove.prev.prev);
+			}
+			
+			if (toRemove.next.next != list.getLast().prev) {
+				queue.remove(toRemove.next.next);
+				queue.add(toRemove.next.next);
+			}
 		}
 		
 		double[] toReturn = new double[2*k];
@@ -42,7 +42,7 @@ public class Lab2b {
 			toReturn[i] = toAdd.elt;
 			list.remove(toAdd);
 		}
-				
+		
 		return toReturn;
 	}
 	
@@ -56,7 +56,15 @@ public class Lab2b {
 		 */
 		@Override
 		public int compare(DLList<Double>.Node arg0, DLList<Double>.Node arg1) {
-			return (int)(calculateSignificance(arg0) - calculateSignificance(arg1));
+			double difference = calculateSignificance(arg0) - calculateSignificance(arg1);
+			
+			if (difference < 0) {
+				return -1;
+			} else if (difference > 0) {
+				return 1;
+			} else {
+				return 0;
+			}
 		}
 
 		/**
@@ -71,22 +79,21 @@ public class Lab2b {
 			double middleX = node.elt;
 			double middleY = node.next.elt;
 			double rightX = node.next.next.elt;
-			double rightY = node.next.next.next.elt;
+			double rightY = node.next.next.next.elt;			
 			
-			//L-P
+			//L-P = sqrt( (x_L - x_P)^2 + (y_L - y_P)^2 )
 			double l1 = Math.sqrt(Math.pow(leftX - middleX, 2) + 
 					Math.pow(leftY - middleY, 2));
 			
-			//P-R
+			//P-R = sqrt( (x_P - x_R)^2 + (y_P - y_R)^2 )
 			double l2 = Math.sqrt(Math.pow(middleX - rightX, 2) + 
 					Math.pow(middleY - rightY, 2));
 			
-			//L-R
+			//L-R = sqrt( (x_L - x_R)^2 + (y_L - y_R)^2 )
 			double l3 = Math.sqrt(Math.pow(leftX - rightX, 2) + 
 					Math.pow(leftY - rightY, 2));
 			
 			return l1 + l2 - l3;
 		}
-		
 	}
 }
