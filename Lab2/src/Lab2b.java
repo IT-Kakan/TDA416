@@ -7,13 +7,19 @@ public class Lab2b {
 		DLList<Double> list = new DLList<Double>();
 		PriorityQueue<DLList<Double>.Node> queue = new PriorityQueue<>(new NodeComparator());
 		
-		for (int i = 0; i < poly.length; i++) {
-			list.addLast(poly[i]);
-			
+		for (double d : poly) {
+			list.addLast(d);
+			/*
 			//If x-coordinate, add to queue
 			if (i > 2 && i < poly.length-2 && i % 2 == 0) {
 				queue.add(list.getLast());
-			}
+			}*/
+		}
+		
+		DLList<Double>.Node node = list.getFirst().next;
+		while(node.next != null) {
+			queue.add(node);
+			node = node.next;
 		}
 		
 		for (; k > 0; k--) {
