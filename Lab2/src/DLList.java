@@ -150,9 +150,14 @@ public class DLList<E> {
   public void remove(Node l) {
       if (l.prev != null) {
     	  l.prev.next = l.next;
+      } else {
+    	  first = l.next;
       }
+      
       if (l.next != null) {
     	  l.next.prev = l.prev;
+      } else {
+    	  last = l.prev;
       }
   }
 }
