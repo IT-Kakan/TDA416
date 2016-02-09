@@ -3,20 +3,35 @@ import java.util.PriorityQueue;
 
 public class Lab2b {
 
+	/**
+	 * Method to simplify a given shape by removing the least significant points until only k points remains.
+	 * Pre: poly contains coordinates such that poly[0] is the x-coordinate of the first point, poly[1] is the
+	 * y-coordinate of the first point, poly[2] is the x-coordinate of the second point and so on.
+	 * Pre: poly has a length of at least 4.
+	 * Pre: each element in poly is >= 0.
+	 * Post: poly is unaltered.
+	 * @param poly The points containing the shape to simplify.
+	 * @param k the number of points that the simplified shape should contain.
+	 * @return An array containing the simplified shape.
+	 */
 	public static double[] simplifyShape(double[] poly, int k) {
 		DLList<Double> list = new DLList<Double>();
 		PriorityQueue<DLList<Double>.Node> queue = new PriorityQueue<>(new NodeComparator());
 		
+		//Add all x- and y-coordinates to a DLList with nodes
 		for (double d : poly) {
 			list.addLast(d);
 		}
 		
+		//Add all x-coordinates to the priority queue,
+		//except for the very first and last points (should not be removed).
 		DLList<Double>.Node node = list.getFirst().next.next;
 		while (node.next.next != null) {
 			queue.add(node);
 			node = node.next.next;	
 		}
 		
+		//while (first point + queue.size() + last point < k)
 		while (queue.size()+2 > k){
 			DLList<Double>.Node toRemove = queue.poll();
 			
@@ -37,10 +52,10 @@ public class Lab2b {
 		}
 		
 		double[] toReturn = new double[2*k];
+		//Add first element in list to array, and then remove it from the list
 		for (int i = 0; i < toReturn.length; i++) {
-			DLList<Double>.Node toAdd = list.getFirst();
-			toReturn[i] = toAdd.elt;
-			list.remove(toAdd);
+			toReturn[i] = list.getFirst().elt;
+			list.remove(list.getFirst());
 		}
 		
 		return toReturn;
