@@ -4,7 +4,7 @@ import java.util.ListIterator;
 /**
  * A set which maintains elements in ascending order.
  * 
- * @param <E> 
+ * @param <E> The type which the set should contain.
  */
 public class SortedLinkedListSet<E extends Comparable<? super E>> implements SimpleSet<E> {
 	
@@ -38,22 +38,6 @@ public class SortedLinkedListSet<E extends Comparable<? super E>> implements Sim
 		if (contains(x)) {
 			return false;
 		} else {
-			
-			/*
-			//If the element is larger than the largest value in the list, insert the element last (time is O(1)).
-			if (x.compareTo(sortedList.getLast()) > 0) {
-				sortedList.addLast(x);
-				return true;
-			}
-			
-			//If the element is smaller than the smallest value in the list, insert the element first (time is O(1)).
-			if (x.compareTo(sortedList.getFirst()) < 0) {
-				sortedList.addFirst(x);
-				return true;
-			}	
-			
-			*/
- 
 			
 			//Insert the element between the least lesser element and the least greater element.
 			//Captures the case where the element is less than all other elements.
