@@ -1,11 +1,22 @@
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+/**
+ * A set which maintains elements in ascending order.
+ * 
+ * @param <E> 
+ */
 public class SortedLinkedListSet<E extends Comparable<? super E>> implements SimpleSet<E> {
 	
-	LinkedList<E> sortedList = new LinkedList<>();
+	LinkedList<E> sortedList;
 
-
+	/**
+	 * Constructs a new empty SortedLinkedListSet.
+	 */
+	public SortedLinkedListSet() {
+		sortedList = new LinkedList<>();		
+	}
+	
 	/**
 	 * Returns the number of elements in the set.
 	 * @return The number of elements in the set.
