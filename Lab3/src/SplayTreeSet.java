@@ -196,7 +196,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * Rotates the tree in the shortest way until the parameter is the root.
 		 * @param node The node to become the new root.
 		 */
-		private void splay(Node node/*, Node parent, Node grandparent*/) {
+		private void splay(Node node) {
 			/*E x = node.getData();
 			E p = parent.getData();
 			E g = grandparent.getData();
@@ -226,40 +226,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			//
 			//
 			//
-			
-			
-			//1. a
-			if ((x.compareTo(p) > 0 && p.compareTo(g) < 0)) {
-				//We first rotate X and P left,
-				//zig (x, p)
-				
-				//and then rotate X and G right,
-				//zag(x, g)
-			}
-			
-			//1. b
-			if (x.compareTo(p) < 0 && p.compareTo(g) > 0) {
-				//We first rotate X and P right
-				//zag(x, p)
-				
-				
-				//and then X and G left.
-				//zig(x, g)
-				
-			}
-			
-			//2. a
-			if (x.compareTo(p) < 0 && p.compareTo(g) < 0) {
-				//We first rotate G and P right
-				
-				//and then P and X right
-			}
-			
-			//2. b
-			if (x.compareTo(p) > 0 && p.compareTo( )
-			
-			
-			
+
 			
 			
 			
@@ -267,39 +234,64 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			
 		}
 		
-		private void rotateLeft(Node node) {
-			//barnet är åt höger --> rotera åt vänster
-			Node child = node.getRight();
-			node.setRight(child.getLeft());
-			child.setLeft(node);
-			
-			
-			
-			
-			
-			
-			
-			
-			/*
-			if (grandparent.getLeft().equals(parent)) {
-				grandparent.setLeft(child);
-				parent.setLeft(child.getRight();
-				child.setLeft(parent);
-				
-			} else if (grandparent.getRight().equals(parent)) {
-				grandparent.setRight(child);
-				
-				
-			} else {
-				return; //Things are wrong if we get here. This shouldn't really be possible?
-			}*/
-			
+		/**
+		 *  
+		 * @param node
+		 */
+		private void zig(Node node) {
 			
 		}
 		
-		private void rotateRight(Node node) {
-			//barnet är år vänster --> rotera åt höger
+		/**
+		 * Rotates the tree to the left around the given node
+		 * Pre: node is a right child
+		 * @param node The node to be the rotation epicentre
+		 */
+		private void rotateLeft(Node node) {
+			Node parent = node.getParent();
+			Node grandparent = parent.getParent();
 			
+			//Move node's left subtree
+			parent.setRight(node.getLeft());
+			
+			//Change grandparent's linking
+			if (grandparent != null) {
+				if (parent == grandparent.getLeft()) {
+					grandparent.setLeft(node);
+				} else if (parent == grandparent.getRight()) {
+					grandparent.setRight(node);
+				}
+			}
+			
+			//Replace node with parent
+			parent.setParent(node);
+			node.setLeft(parent);
+		}
+		
+		/**
+		 * Rotates the tree to the right around the given node
+		 * Pre: node is a left child
+		 * @param node The node to be the rotation epicentre
+		 */
+		private void rotateRight(Node node) {
+			Node parent = node.getParent();
+			Node grandparent = parent.getParent();
+			
+			//Move node's right subtree
+			parent.setLeft(node.getRight());
+			
+			//Change grandparent's linking
+			if (grandparent != null) {
+				if (parent == grandparent.getLeft()) {
+					grandparent.setLeft(node);
+				} else if (parent == grandparent.getRight()) {
+					grandparent.setRight(node);
+				}
+			}
+			
+			//Replace node with parent
+			parent.setParent(node);
+			node.setRight(parent);
 		}
 		
 		private int getSize() {
