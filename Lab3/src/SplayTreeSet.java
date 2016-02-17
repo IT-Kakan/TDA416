@@ -169,24 +169,6 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				return true;				
 			}
 		}
-
-		
-		/**
-		 * Finds the next higher value in the tree. 
-		 * Side effect: updates the parameter to point to the parent of the returned node.
-		 * @param start The starting position. The reference will be updated to point to the parent of the returned node.
-		 * @return The node containing the value.
-		 */
-		private Node getNextHigher(Node start) {
-			//Find the next higher key by traversing right once, then left as far as possible.
-			//Update parent with each traversing.
-			Node nextHigher = start.getRight();
-			while (nextHigher.getLeft() != null) {
-				start = nextHigher;
-				nextHigher = nextHigher.getLeft();
-			}
-			return nextHigher;
-		}
 		
 		/**
 		 * Locates and returns the first node containing the parameterized value.
