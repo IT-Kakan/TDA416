@@ -1,3 +1,7 @@
+import com.sun.xml.internal.ws.api.pipe.NextAction;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
 /**
  * 
  * A set which maintains elements in splay tree order.
@@ -47,11 +51,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 */
 	@Override
 	public boolean remove(E x) {
-		if (!contains(x)) {
-			return false;
-		} else {
-			return tree.remove(x);
-		}
+		return tree.remove(x);
 	}
 
 	/**
@@ -68,217 +68,108 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		}
 	}
 	
-	
+	/**
+	 * Inner class used for managing the set.
+	 *
+	 */
 	private class SplayTree {
 		
 		private Node root;
 		private int size;
 		
+		/**
+		 * creates an empty splay tree.
+		 */
 		private SplayTree() {
 			root = null;
 			size = 0;
 		}
 		
+		/**
+		 * Adds a node containing the parameterized value to the tree.
+		 * @param x The value to be added.
+		 */
 		private void add(E x) {
 			if (size == 0) {
 				root = new Node(x);				
 			} else {
 				
 				Node current = root;
+				Node parent;
 				int difference;
 				//add as for a binary search tree
 				do {
 					difference = x.compareTo(current.getData());
+					parent = current;
 					if (difference < 0) {
 						current = current.getLeft();
 					} else if (difference > 0) {
 						current = current.getRight();
 					}				
 				} while (current != null && difference != 0);
-				current = new Node(x);
-				
+				current = new Node(x, parent);
 				splay(current);
 			}
 			size++;
 		}
 		
 		private boolean remove(E x) {
-			
-			//There are several cases to consider.
-			
-			//0. The tree is empty. 
-			//1. The value does not exist.
-			//2. The value to remove is in the root.
-			//	2. a) The node to be removed has two children
-			//	2. b) The node to be removed has zero or one children.
-			//3. The value is to the left of its parent
-			//	3. a) The node to be removed has two children
-			//	3. b) The node to be removed has zero or one children
-			//4. The value is to the right of its parent
-			//	4. a) The node to be removed has two children
-			//	4. b) The node to be removed has zero or one children
+			//There are three cases to consider:
+			//1. The tree is empty
+			//2. The element does not exist
+			//3. The element exists and, since it was found, is in root.
 			
 			//Handles the case where the tree is empty.
 			if (size == 0) {
 				return false;
-			}		
+			}
 			
-			Node parent = null;
-			
-			if (x.compareTo(root.getData()) == 0) {
-				Node dataToRemove = root;
-				//Handles the case where the node to be removed has two children.
-				if (dataToRemove.getLeft() != null && dataToRemove.getRight() != null) {
-					
-					//Find the next higher key by traversing right once, then left as far as possible.
-					//Update parent with each traversing.
-					Node nextHigher = dataToRemove.getRight();
-					parent = dataToRemove;
+			//Handles the case where the element does not exist.
+			if (find(x) == null) {
+				return false;
+			} else { //Handles the case where the element was found.
+				//Assert: the node to remove is in root
+				
+				//Check if the node to remove has two children
+				if (root.getLeft() != null && root.getRight() != null) {
+					//traverse to find the next higher value
+					Node nextHigher = root.getRight();
 					while (nextHigher.getLeft() != null) {
-						parent = nextHigher;
 						nextHigher = nextHigher.getLeft();
 					}
 					
+					//nextHigher is now the node containing the next higher value.
 					
-							
-					//Remove the parameterized data by replacing it with the value of the next higher node.
-					dataToRemove.setData(nextHigher.getData());
+					//Replace the data in the root with the next higher value
+					root.setData(nextHigher.getData());
 					
-					//Remove the node whose data was copied (nextHigher) to the node specified by the parameter.
-					//In effect, the result will be as if the node specified by the parameter was removed.
+					//Remove the nextHigher node, as its data is duplicated
+					Node parent = nextHigher.getParent();
 					if (nextHigher.getRight() != null) {
 						parent.setLeft(nextHigher.getRight());
-					} else {					
-						parent.setLeft(null);
-					}	
-			
-				} else { //Handles the case where the node to be removed has zero or one child.
-					if (dataToRemove.getLeft() != null) {
-						root = dataToRemove.getLeft();
-					} else if (dataToRemove.getRight() != null) {
-						root = dataToRemove.getRight();
 					} else {
-						root = null;
+						parent.setLeft(null);
 					}
+					splay(parent);
+
+
+				} else if (root.getLeft() != null && root.getRight() == null) {
+					//root has only a left child
+					
+					root = root.getLeft();
+				} else if (root.getRight() != null && root.getLeft() == null) {
+					//root has only a right child
+					
+					root = root.getRight();
+				} else { //root has no children
+					root = null;
 				}
 				
 				size--;
-				splay(parent);
-				return true;
+				return true;				
 			}
-			
-			parent = root;
-			
-			
-			boolean finished = false;
-			
-			
-			while (!finished) {
-								
-				//Handles the case where the node to be removed is to the left of the parent.
-				if (x.compareTo(parent.getLeft().getData()) == 0) {
-
-					Node dataToRemove = parent.getLeft();
-					
-					//Handles the case where the node to be removed has two children.
-					if (dataToRemove.getLeft() != null && dataToRemove.getRight() != null) {
-						
-						//Find the next higher key by traversing right once, then left as far as possible.
-						//Update parent with each traversing.
-						Node nextHigher = dataToRemove.getRight();
-						parent = dataToRemove;
-						while (nextHigher.getLeft() != null) {
-							parent = nextHigher;
-							nextHigher = nextHigher.getLeft();
-						}
-						
-						//Remove the parameterized data by replacing it with the value of the next higher node.
-						dataToRemove.setData(nextHigher.getData());
-						
-						//Remove the node whose data was copied (nextHigher) to the node specified by the parameter.
-						//In effect, the result will be as if the node specified by the parameter was removed.
-						if (nextHigher.getRight() != null) {
-							parent.setLeft(nextHigher.getRight());
-						} else {					
-							parent.setLeft(null);
-						}		
-						
-					} else { //Handles the case where the node to be removed has zero or one child.
-						if (dataToRemove.getLeft() != null) {
-							parent.setLeft(dataToRemove.getLeft());
-						} else if (dataToRemove.getRight() != null){
-							parent.setLeft(dataToRemove.getRight());
-						} else {
-							parent.setLeft(null);
-						}
-						
-					}
-					size--;
-					splay(parent);
-					return true;
-				}
-				
-				//Handles the case where the node to be removed is to the left of the parent.
-				if (x.compareTo(parent.getRight().getData()) == 0) {	
-					
-					Node dataToRemove = parent.getRight();
-					
-					//Handles the case where the node to be removed has two children.
-					if (dataToRemove.getLeft() != null && dataToRemove.getRight() != null) {
-					
-						//Find the next higher key by traversing right once, then left as far as possible.
-						//Update parent with each traversing.
-						Node nextHigher = dataToRemove.getRight();
-						parent = dataToRemove;
-						while (nextHigher.getLeft() != null) {
-							parent = nextHigher;
-							nextHigher = nextHigher.getLeft();
-						}
-						//Remove the parameterized data by replacing it with the value of the next higher node.
-						dataToRemove.setData(nextHigher.getData());
-						
-						//Remove the node whose data was copied (nextHigher) to the node specified by the parameter.
-						//In effect, the result will be as if the node specified by the parameter was removed.
-						if (nextHigher.getRight() != null) {
-							parent.setRight(nextHigher.getRight());
-						} else {					
-							parent.setRight(null);
-						}						
-						
-					} else { //Handles the case where the node to be removed has zero or one child.
-						if (dataToRemove.getLeft() != null) {
-							parent.setRight(dataToRemove.getLeft());
-						} else if (dataToRemove.getRight() != null) {
-							parent.setRight(dataToRemove.getRight());
-						} else {
-							parent.setRight(null);
-						}
-					}
-					size--;
-					splay(parent);
-					return true;
-				}
-				
-				//The node to remove was not a child to the parent.
-				//Continue traversing the tree.
-				if (x.compareTo(parent.getData()) < 0) {
-					if (parent.getLeft() == null) {
-						return false;
-					} else {
-						parent = parent.getLeft();
-					}
-				}
-				
-				if (x.compareTo(parent.getData()) > 0) {
-					if(parent.getRight() == null) {
-						return false;
-					} else {
-						parent = parent.getRight();
-					}
-				}
-			}
-			return false;
 		}
+
 		
 		/**
 		 * Finds the next higher value in the tree. 
@@ -330,12 +221,32 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			
 			
 			//Three cases:
-			//1. 		 O				O		if x >= p && p <= g
+			//1. 	a	 O			b	O		if x >= p && p <= g
 			//			/		OR		 \
 			//		   O				  O		OR
 			//			\				 /
 			//			 O				O		if x <= p && p >= g
+			//
+			//
+			//
+			//2. 	a	 O			b	O		if x <= p && p <= g
+			//			/		OR		 \
+			//		   O				  O		OR
+			//		  /					   \
+			//		 O						O	if x >= p && p >= g
+			//
+			//
+			//
+			//3. 
+			//
+			//
+			//
+			//
+			//
+			//
 			
+			
+			//1. a
 			if ((x.compareTo(p) > 0 && p.compareTo(g) < 0)) {
 				//We first rotate X and P left,
 				//zig (x, p)
@@ -344,6 +255,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				//zag(x, g)
 			}
 			
+			//1. b
 			if (x.compareTo(p) < 0 && p.compareTo(g) > 0) {
 				//We first rotate X and P right
 				//zag(x, p)
@@ -352,7 +264,24 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				//and then X and G left.
 				//zig(x, g)
 				
-			}*/
+			}
+			
+			//2. a
+			if (x.compareTo(p) < 0 && p.compareTo(g) < 0) {
+				//We first rotate G and P right
+				
+				//and then P and X right
+			}
+			
+			//2. b
+			if (x.compareTo(p) > 0 && p.compareTo( )
+			
+			
+			
+			
+			
+			
+			*/
 			
 		}
 		
@@ -386,7 +315,8 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			
 		}
 		
-		private void zag(Node node, Node parent) {
+		private void rotateRight(Node node) {
+			//barnet är år vänster --> rotera åt höger
 			
 		}
 		
@@ -401,13 +331,19 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			private E data;
 			private Node left;
 			private Node right;
+			private Node parent;
 			
 			/**
 			 * Constructs a new Node containing the data.
 			 * @param data The data the Node should contain.
 			 */
 			private Node(E data) {
+				this(data, null);
+			}
+			
+			private Node(E data, Node parent) {
 				this.data = data;
+				this.parent = parent;
 				left = null;
 				right = null;
 			}
@@ -424,6 +360,10 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				return right;
 			}
 			
+			private Node getParent() {
+				return parent;
+			}
+			
 			private void setLeft(Node newNode) {
 				left = newNode;
 			}
@@ -434,6 +374,10 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			
 			private void setData(E data) {
 				this.data = data;
+			}
+			
+			private void setParent(Node newNode) {
+				parent = newNode;
 			}
 		}	
 	}
