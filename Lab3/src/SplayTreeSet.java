@@ -1,6 +1,3 @@
-import com.sun.xml.internal.ws.api.pipe.NextAction;
-
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 /**
  * 
@@ -61,6 +58,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 */
 	@Override
 	public boolean contains(E x) {
+		System.out.println("CONTAINS " + x);
 		if (tree.find(x) == null) {
 			return false;
 		} else {
@@ -90,6 +88,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param x The value to be added.
 		 */
 		private void add(E x) {
+			System.out.println("ADD " + x);
 			if (size == 0) {
 				root = new Node(x);				
 			} else {
@@ -114,6 +113,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		}
 		
 		private boolean remove(E x) {
+			System.out.println("REMOVE " + x);
 			//There are three cases to consider:
 			//1. The tree is empty
 			//2. The element does not exist
@@ -172,31 +172,101 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		
 		/**
 		 * Locates and returns the first node containing the parameterized value.
+		 * Post: If the node is found, it is rotated to root. Otherwise, the node with the closest value is rotated to root.
 		 * @param x The value that the node to be found should contain.
 		 * @return The first node containing the parameterized value. Null if no such node exists.
 		 */
 		private Node find(E x) {
+			System.out.println("FIND " + x);
+			if (root == null) {
+				return null;
+			}
+			
 			Node next = root;
 			int difference = x.compareTo(next.getData());
-			while (next != null && difference != 0) {
+			while (difference != 0) {
 				if (difference < 0) {
+					if (next.getLeft() == null) {
+						splay(next);
+						return null;
+					}
 					next = next.getLeft();
 				} else if (difference > 0) {
+					if (next.getRight() == null) {
+						splay(next);
+						return null;
+					}
 					next = next.getRight();
 				}
-			}
-			if (next == null) {
-				return null;
+				difference = x.compareTo(next.getData());
 			}
 			splay(next);
 			return next;
-		}		
+		}
 		
 		/**
 		 * Rotates the tree in the shortest way until the parameter is the root.
 		 * @param node The node to become the new root.
 		 */
 		private void splay(Node node) {
+			System.out.println("SPLAY");
+			System.out.println("Before splay");
+			print();
+			if (root == null || node == root) {
+				System.out.println("After splay");
+				print();
+				return;
+			} else if (node == root.getLeft()) {
+				rotateRight(node);
+				System.out.println("After splay");
+				print();
+				return;
+			} else if (node == root.getRight()) {
+				rotateLeft(node);
+				System.out.println("After splay");
+				print();
+				return;
+			}
+			
+			Node parent = node.getParent();
+			Node grandparent = parent.getParent();
+			
+			if (node.getData().compareTo(parent.getData()) < 0) { //node is left child
+				if (parent.getData().compareTo(grandparent.getData()) < 0) { //parent is left child
+					//zigzig, case parent left and node left
+					System.out.println("Left-left");
+					
+					rotateRight(parent);
+					rotateRight(node);
+				} else if (parent.getData().compareTo(grandparent.getData()) > 0) { //parent is right child
+					//zigzag, case parent right and node left
+					System.out.println("right-left");
+					
+					rotateRight(node);
+					rotateLeft(node);
+				}
+			} else if (node.getData().compareTo(parent.getData()) > 0) { //node is right child
+				if (parent.getData().compareTo(grandparent.getData()) < 0) { //parent is left child
+					//zigzag, case parent left and node right
+					System.out.println("left-right");
+					
+					rotateLeft(node);
+					rotateRight(node);
+				} else if (parent.getData().compareTo(grandparent.getData()) > 0)  { //parent is right child
+					//zigzig, case parent right and node right
+					System.out.println("right-right");
+					
+					rotateLeft(parent);
+					rotateLeft(node);
+				}
+			}
+			System.out.println("After splay");
+			print();
+			splay(node);
+			
+					
+			
+			
 			/*E x = node.getData();
 			E p = parent.getData();
 			E g = grandparent.getData();
@@ -219,26 +289,13 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			//
 			//
 			//
-			//3. 
+			//3. a	0 <-root OR	b	0  <-- root
+			//	   /				 \
+			//	  0					  0
 			//
 			//
-			//
-			//
-			//
-			//
-
-			
-			
 			
 			*/
-			
-		}
-		
-		/**
-		 *  
-		 * @param node
-		 */
-		private void zig(Node node) {
 			
 		}
 		
@@ -261,6 +318,10 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				} else if (parent == grandparent.getRight()) {
 					grandparent.setRight(node);
 				}
+			} else { //grandparent == null --> parent == root
+				root.setParent(node);
+				root = node;
+				node.setParent(null);
 			}
 			
 			//Replace node with parent
@@ -287,11 +348,37 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				} else if (parent == grandparent.getRight()) {
 					grandparent.setRight(node);
 				}
+			} else { //grandparent == null --> parent == root
+				root.setParent(node);
+				root = node;
+				node.setParent(null);
 			}
 			
 			//Replace node with parent
 			parent.setParent(node);
 			node.setRight(parent);
+		}
+		
+		
+		
+		private void print() {
+			StringBuilder sb = new StringBuilder();
+			pre(root, 1, sb);
+			System.out.println(sb.toString());
+		}
+		
+		private void pre(Node node, int depth, StringBuilder sb) {
+			for (int i = 1; i < depth; i++) {
+				sb.append("  ");
+			}
+			if(node == null) {
+				sb.append("null\n");
+			} else {
+				sb.append(node.getData());
+				sb.append("\n");
+				pre(node.getLeft(), depth + 1, sb);
+				pre(node.getRight(), depth + 1, sb);
+			}
 		}
 		
 		private int getSize() {
@@ -320,6 +407,13 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				this.parent = parent;
 				left = null;
 				right = null;
+				if (parent != null) {
+					if (data.compareTo(parent.getData()) < 0) {
+						parent.setLeft(this);
+					} else if (data.compareTo(parent.getData()) > 0) {
+						parent.setRight(this);
+					}
+				}
 			}
 			
 			private E getData() {
