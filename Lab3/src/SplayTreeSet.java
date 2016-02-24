@@ -22,6 +22,8 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 */
 	@Override
 	public int size() {
+		System.out.print("Command Size: " + tree.getSize());
+		System.out.println();
 		return tree.getSize();
 	}
 
@@ -31,12 +33,16 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 * @return True if the element did not exist. False otherwise.
 	 */
 	@Override
-	public boolean add(E x) {		
+	public boolean add(E x) {
+		System.out.print("Command Add: " + x);
 		//Only add an element if it is not already in the list.
-		if (contains(x)) {
+		//if (contains(x)) {
+		if (tree.find(x, false) != null) {
+			System.out.println(" Size is now:" + tree.getSize());
 			return false;
 		} else {
 			tree.add(x);
+			System.out.println(" Size is now: " + tree.getSize());
 			return true;
 		}
 	}
@@ -48,7 +54,10 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 */
 	@Override
 	public boolean remove(E x) {
-		return tree.remove(x);
+		System.out.print("Command remove: " + x);
+		boolean rm = tree.remove(x);
+		System.out.println(" Size is now: " + tree.getSize());
+		return rm;
 	}
 
 	/**
@@ -57,14 +66,16 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 	 * @return True is the element is part of the set. False otherwise.
 	 */
 	@Override
-	public boolean contains(E x) {
-		System.out.println("CONTAINS " + x);
+	public boolean contains(E x) {		
+		System.out.print("Command contains: " + x);
 		SplayTreeSet<E>.SplayTree.Node result = tree.find(x, false);
 		
 		if (result == null) {
+			System.out.println(" Size is now: " + tree.getSize());
 			return false;
 		} else {
 			tree.splay(result);
+			System.out.println(" Size is now: " + tree.getSize());
 			return true;
 		}
 	}
@@ -91,7 +102,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param x The value to be added.
 		 */
 		private void add(E x) {
-			System.out.println("ADD " + x);
+			System.out.print("--> add " + x);
 			if (size == 0) {
 				root = new Node(x);				
 			} else {
@@ -107,15 +118,22 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 					} else if (difference > 0) {
 						current = current.getRight();
 					} else {
+						print();
 						throw new InternalError("In add(): Contains was erroneous");
 					}
 				} while (current != null);
 				current = new Node(x);
 				current.setParent(parent);
+				
+				
+				
 				if (current.getData().compareTo(parent.getData()) < 0) {
 					parent.setLeft(current);
 				} else if (current.getData().compareTo(parent.getData()) > 0) {
 					parent.setRight(current);
+				} else {
+					print();
+					throw new InternalError("In add(): Contains was erroneous");
 				}
 				
 				splay(current);
@@ -124,7 +142,46 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		}
 		
 		private boolean remove(E x) {
-			System.out.println("REMOVE " + x);
+			System.out.print("--> remove" + x);
+			
+			if (size == 0) {
+				if (root != null) {
+					throw new InternalError("------------------------------------------------------SIZE IS ZERO; ROOT NOT NULL");
+				}
+				return false;
+			}
+			
+			
+			//the value does not exist in the tree
+			if (find(x) == null) {
+				return false;
+			} else {
+				//The value exists ==> the node is in root
+				if (root.getLeft() == null) {
+					if (root.getRight() != null) {
+						root.getRight().setParent(null);
+					}
+					root = root.getRight();
+					size--;
+					return true;
+				} else {
+					root.getLeft().setRight(root.getRight());
+					root.getLeft().setParent(null);
+					root = root.getLeft();
+					if (root.getRight() != null) {
+						root.getRight().setParent(root);
+					}
+					size--;
+					return true;
+				}
+			}
+
+
+			
+			
+			
+			
+			/*System.out.print("--> remove" + x);
 			//There are three cases to consider:
 			//1. The tree is empty
 			//2. The element does not exist
@@ -161,6 +218,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 					} else if (nodeToRemove == parent.getRight()) {
 						parent.setRight(null);
 					} else {
+						print();
 						throw new InternalError("In remove(): parent is not connected to node");
 					}
 					splay(parent);
@@ -169,7 +227,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				}
 			}
 			
-			//Handles the case when the child is a left child
+			//Handles the case when the single child is a left child
 			if (nodeToRemove.getLeft() != null && nodeToRemove.getRight() == null) {
 				Node child = nodeToRemove.getLeft();
 				
@@ -185,6 +243,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 					} else if (nodeToRemove == parent.getRight()) {
 						parent.setRight(child);
 					} else {
+						print();
 						throw new InternalError("In remove(): parent is not connected to node");
 					}
 					
@@ -195,13 +254,13 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 				}
 			}
 			
-			//Handles the case when the child is a right child
+			//Handles the case when the single child is a right child
 			if (nodeToRemove.getLeft() == null && nodeToRemove.getRight() != null) {
 				Node child = nodeToRemove.getRight();
 				
-				if (parent == null) {
+				if (nodeToRemove == root) {
+					child.setParent(null);
 					root = child;
-					root.setParent(null);
 					//No need to splay, since node is root
 					size--;
 					return true;
@@ -211,6 +270,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 					} else if (nodeToRemove == parent.getRight()) {
 						parent.setRight(child);
 					} else {
+						print();
 						throw new InternalError("In remove(): parent is not connected to node");
 					}
 					
@@ -241,9 +301,10 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			}
 			
 			nextHigher.setParent(null);
+			
 			splay(parent);
 			size--;
-			return true;
+			return true;*/
 		}
 		
 		/**
@@ -253,14 +314,20 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param splay Splays the tree if true. Otherwise, only splays if x does not exist.
 		 * @return The first node containing the parameterized value. Null if no such node exists.
 		 */
-		private Node find(E x, boolean splay) {
-			System.out.println("FIND " + x);
+		private Node find(E x, boolean splay) {		
+			System.out.print("--> find " + x);
 			if (root == null) {
 				return null;
 			}
 			
 			Node next = root;
 			int difference = x.compareTo(next.getData());
+			
+			//Node is root, do not splay
+			if (difference == 0) {
+				return next;
+			}
+			
 			while (difference != 0) {
 				if (difference < 0) {
 					if (next.getLeft() == null) {
@@ -298,7 +365,7 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param node The node to become the new root.
 		 */
 		private void splay(Node node) {
-			System.out.println("SPLAY");
+			System.out.print("--> splay");
 		//	System.out.println("Before splay");
 			//print();
 			if (root == null || node == root) {
@@ -318,36 +385,58 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			}
 			
 			Node parent = node.getParent();
+			
+			
+			
+			
+			if (node.getParent() == null && node != root) {
+				print();
+				throw new InternalError("In splay(): node is not root, but has no parent");
+			}
+			
 			Node grandparent = parent.getParent();
 			
-			if (node.getData().compareTo(parent.getData()) < 0) { //node is left child
-				if (parent.getData().compareTo(grandparent.getData()) < 0) { //parent is left child
+			
+			
+			if (parent.getParent() == null && parent != root) {
+				print();
+				throw new InternalError("In splay(): parent is not root, but has no parent");
+			}
+			
+			if (node == parent.getLeft()) { //node is left child
+				if (parent == grandparent.getLeft()) { //parent is left child
 					//zigzig, case parent left and node left
 					System.out.println("Left-left");
 					
 					rotateRight(parent);
 					rotateRight(node);
-				} else if (parent.getData().compareTo(grandparent.getData()) > 0) { //parent is right child
+				} else if (parent == grandparent.getRight()) { //parent is right child
 					//zigzag, case parent right and node left
 					System.out.println("right-left");
 					
 					rotateRight(node);
 					rotateLeft(node);
+				} else {
+					throw new InternalError("In Splay(), grandparent is not connected to parent");
 				}
-			} else if (node.getData().compareTo(parent.getData()) > 0) { //node is right child
-				if (parent.getData().compareTo(grandparent.getData()) < 0) { //parent is left child
+			} else if (node == parent.getRight()) { //node is right child
+				if (parent == grandparent.getLeft()) { //parent is left child
 					//zigzag, case parent left and node right
 					System.out.println("left-right");
 					
 					rotateLeft(node);
 					rotateRight(node);
-				} else if (parent.getData().compareTo(grandparent.getData()) > 0)  { //parent is right child
+				} else if (parent == grandparent.getRight())  { //parent is right child
 					//zigzig, case parent right and node right
 					System.out.println("right-right");
 					
 					rotateLeft(parent);
 					rotateLeft(node);
+				} else {
+					throw new InternalError("In Splay(), grandparent is not connected to parent");
 				}
+			} else {
+				throw new InternalError("In Splay(), parent is not connected to node");
 			}
 		//	System.out.println("After splay");
 			//print();
@@ -394,16 +483,35 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param node The node to be the rotation epicentre
 		 */
 		private void rotateLeft(Node node) {
+			System.out.print("--> rotateLeft");
 			if (node == root || node == null) {
+				print();
 				throw new InternalError("In rotateLeft(): node is root");
 			}
 			
+			if (node == root.getRight()) {
+				root.setRight(node.getLeft());
+				if (node.getLeft() != null) {
+					node.getLeft().setParent(root);
+				}
+				root.setParent(node);
+				node.setLeft(root);
+				root = node;
+				return;
+			}
+			
+			if (node.getParent() == null && node != root) {
+				print();
+				throw new InternalError("In rotateLeft(): node is not root, but has no parent");
+			}
+			
 			Node parent = node.getParent();
+			parent.setRight(node.getLeft());
 			
 			if (node.getLeft() != null) {
 				System.out.println("Parent is: " + parent);
 				System.out.println("LeftChild is: " + node.getLeft());
-				parent.setRight(node.getLeft());
+				
 				node.getLeft().setParent(parent);
 			}
 			node.setLeft(parent);
@@ -411,15 +519,21 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			if (parent != root) {
 				//check if node should be a right or left child of grandparent
 				//(the same type as parent was, but we don't know if parent was a right or left child)
-				if (parent.getParent().getData().compareTo(node.getData()) > 0) {
+				if (parent == parent.getParent().getLeft()) {
 					parent.getParent().setLeft(node);
-				} else {
+				} else if (parent == parent.getParent().getRight()) {
 					parent.getParent().setRight(node);
+				} else {
+					throw new InternalError("In rotateLeft(): grandparent is not connected to parent");
 				}
 			
 			}
 			node.setParent(parent.getParent());
 			parent.setParent(node);
+			
+			if(node.getParent() == null) {
+				root = node;
+			}
 		}
 		
 		/**
@@ -428,14 +542,40 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 		 * @param node The node to be the rotation epicentre
 		 */
 		private void rotateRight(Node node) {
+			System.out.print("--> rotateRight");
 			if (node == root || node == null) {
 				throw new InternalError("In rotateRight(): node is root");
 			}
 			
+			
+			//TODO tell Dice
+			if (node == root.getLeft()) {
+				root.setLeft(node.getRight());
+				if (node.getRight() != null) {
+					node.getRight().setParent(root);
+				}
+				
+				root.setParent(node);
+				node.setRight(root);
+				
+				root = node;
+				return;
+			}
+			
+			
+			
+			if (node.getParent() == null && node != root) {
+				print();
+				throw new InternalError("In rotateLeft(): node is not root, but has no parent");
+			}
+			
 			Node parent = node.getParent();
+			parent.setLeft(node.getRight()); //TODO tell Dice this was in IF below
 			
 			if (node.getRight() != null) {
-				parent.setLeft(node.getRight());
+				System.out.println("Parent is: " + parent);
+				System.out.println("RightChild is: " + node.getRight());
+				
 				node.getRight().setParent(parent);
 			}
 			node.setRight(parent);
@@ -443,20 +583,27 @@ public class SplayTreeSet<E extends Comparable<? super E>> implements SimpleSet<
 			if (parent != root) {				
 				//check if node should be a right or left child of grandparent
 				//(the same type as parent was, but we don't know if parent was a right or left child)
-				if (parent.getParent().getData().compareTo(node.getData()) > 0) {
+				if (parent == parent.getParent().getLeft()) {
 					parent.getParent().setLeft(node);
-				} else {
+				} else if (parent == parent.getParent().getRight()) {
 					parent.getParent().setRight(node);
+				} else {
+					throw new InternalError("In rotateLeft(): grandparent is not connected to parent");
 				}
 			}
 		
 			node.setParent(parent.getParent());
 			parent.setParent(node);	
+			
+			if(node.getParent() == null) {
+				root = node;
+			}
 		}
 			
 		
 		
 		private void print() {
+			System.out.println("Root data: " + root.getData() + ", root left: " + root.getLeft() + ", root right: " + root.getRight());
 			StringBuilder sb = new StringBuilder();
 			pre(root, 1, sb);
 			System.out.println(sb.toString());
