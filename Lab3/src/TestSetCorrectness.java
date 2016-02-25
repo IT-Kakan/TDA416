@@ -22,7 +22,7 @@ public class TestSetCorrectness {
 			throw new IllegalArgumentException("Invalid implementation number.");
 		}
 		
-		for (int i = 0; i < nbrOfIntegers; i++) {
+		for (int i = 0; i < nbrOfOperations; i++) {
 			switch (rand.nextInt(4)) {
 			//Test size
 			case 0:
