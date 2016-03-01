@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 /**
  * A set which maintains elements in ascending order.
  * 
@@ -8,13 +5,13 @@ import java.util.ListIterator;
  */
 public class SortedLinkedListSet<E extends Comparable<? super E>> implements SimpleSet<E> {
 	
-	LinkedList<E> sortedList;
+	SortedLinkedList sortedList;
 
 	/**
 	 * Constructs a new empty SortedLinkedListSet.
 	 */
 	public SortedLinkedListSet() {
-		sortedList = new LinkedList<>();		
+		sortedList = new SortedLinkedList();		
 	}
 	
 	/**
@@ -23,7 +20,7 @@ public class SortedLinkedListSet<E extends Comparable<? super E>> implements Sim
 	 */
 	@Override
 	public int size() {
-		return sortedList.size();
+		return sortedList.getSize();
 	}
 
 	/**
@@ -33,25 +30,11 @@ public class SortedLinkedListSet<E extends Comparable<? super E>> implements Sim
 	 */
 	@Override
 	public boolean add(E x) {
-		
 		//Only add an element if it is not already in the list.
 		if (contains(x)) {
 			return false;
 		} else {
-			
-			//Insert the element between the least lesser element and the least greater element.
-			//Captures the case where the element is less than all other elements.
-			ListIterator<E> iterator = sortedList.listIterator();
-			while (iterator.hasNext()) {
-				if (x.compareTo(iterator.next()) < 0) {
-					sortedList.add(iterator.previousIndex(), x);
-					return true;
-				}
-			}
-			//If the element is larger than all elements, insert last.
-			//Captures the case where the list is empty.
-			sortedList.addLast(x);
-			return true;
+			return sortedList.add(x);
 		}
 	}
 
@@ -62,15 +45,7 @@ public class SortedLinkedListSet<E extends Comparable<? super E>> implements Sim
 	 */
 	@Override
 	public boolean remove(E x) {
-
-		ListIterator<E> iterator = sortedList.listIterator();
-		while (iterator.hasNext()) {
-			if (x.compareTo(iterator.next()) == 0) {
-				sortedList.remove(iterator.previousIndex());
-				return true;
-			}
-		}
-		return false;
+		return sortedList.remove(x);
 	}
 
 	/**
@@ -80,13 +55,137 @@ public class SortedLinkedListSet<E extends Comparable<? super E>> implements Sim
 	 */
 	@Override
 	public boolean contains(E x) {
+		return sortedList.contains(x);
+	}
+	
+	private class SortedLinkedList {
 		
-		ListIterator<E> iterator = sortedList.listIterator();
-		while (iterator.hasNext()) {
-			if (x.compareTo(iterator.next()) == 0) {
+		private Node head;
+		private int size;
+		
+		private SortedLinkedList() {
+			head = null;
+			size = 0;
+		}
+		
+		private int getSize() {
+			return size;
+		}
+		
+		/**
+		 * Adds a new element to the list in its proper place
+		 * @param toAdd The value to add
+		 * @post The list is sorted
+		 * @return True
+		 */
+		private boolean add(E toAdd) {
+			Node newNode = new Node(toAdd);
+
+			//Handles the case of an empty list
+			if (head == null) {
+				head = newNode;
+				size++;
+				return true;
+			} 
+			
+			int difference = toAdd.compareTo(head.getData());
+
+			//Handles the case where the element should be the new head
+			if (difference < 0) {
+				newNode.setNext(head);
+				head = newNode;
+				size++;
 				return true;
 			}
+			
+			Node current = head;
+			
+			//Handles remaining cases
+			while (current.getNext() != null && difference >= 0) {
+				difference = toAdd.compareTo(current.getNext().getData());
+				current = current.getNext();
+			}
+			newNode.setNext(current.getNext());
+			current.setNext(newNode);
+			size++;
+			return true;
 		}
-		return false;
+		
+		/**
+		 * Removes the first occurrence of the element
+		 * @param toRemove The value to remove
+		 * @return True if an element was removed, false otherwise
+		 */
+		private boolean remove(E toRemove) {
+			if (head == null) {
+				return false;
+			}
+			
+			if (toRemove.compareTo(head.getData()) == 0) {
+				head = head.getNext();
+				size--;
+				return true;
+			}
+			
+			Node current = head;
+			int difference;
+			
+			
+			while (current.getNext() != null) {
+				difference = toRemove.compareTo(current.getNext().getData());
+				if (difference == 0) {
+					current.setNext(current.getNext().getNext());
+					size--;
+					return true;
+				} else {
+					current = current.getNext();
+				}
+			}
+			
+			return false;
+		}
+		
+		/**
+		 * Checks whether or not the element exists 
+		 * @param toCheck The value to check
+		 * @return True if the element exists, false otherwise
+		 */
+		private boolean contains(E toCheck) {
+			Node current = head;
+			while (current != null) {
+				if (toCheck.compareTo(current.getData()) == 0) {
+					return true;
+				} else {
+					current = current.getNext();
+				}
+			}
+			return false;
+		}
+		
+		private class Node {
+			E data;
+			Node next;
+			
+			private Node(E data) {
+				this(data, null);
+			}
+			
+			private Node(E data, Node next) {
+				this.data = data;
+				this.next = next;
+			}
+			
+			private Node getNext() {
+				return next;
+			}
+			
+			private void setNext(Node newNode) {
+				next = newNode;
+			}
+			
+			private E getData() {
+				return data;
+			}
+		}
 	}
 }
