@@ -3,14 +3,14 @@ import java.util.*;
 
 public class DirectedGraph<E extends Edge> {
 
-	LinkedList<ListNode>[] adjacencyList; //We expect the graph to have a low density
+	LinkedList<E>[] adjacencyList; //We expect the graph to have a low density
 	
 	/**
 	 * Creates a DirectedGraph containing the given number of nodes.
 	 * @param noOfNodes The number of nodes the graph should contain
 	 */
 	public DirectedGraph(int noOfNodes) {
-		adjacencyList = (LinkedList<ListNode>[])new Object[noOfNodes];
+		adjacencyList = (LinkedList<E>[]) new LinkedList[noOfNodes];
 	}
 
 	/**
@@ -18,14 +18,10 @@ public class DirectedGraph<E extends Edge> {
 	 * @param e The edge to be added
 	 */
 	public void addEdge(E e) {
-		ListNode connection = new ListNode(e.getDest(), e.getWeight());
-		LinkedList<ListNode> previousEdges = adjacencyList[e.getSource()];
-		
-		if (!previousEdges.isEmpty()) {
-			previousEdges.getLast().setNext(connection);
+		if (adjacencyList[e.getSource()] == null) {
+			adjacencyList[e.getSource()] = new LinkedList<>();
 		}
-		
-		previousEdges.add(connection);
+		adjacencyList[e.getSource()].add(e);
 	}
 
 	/**
@@ -43,10 +39,10 @@ public class DirectedGraph<E extends Edge> {
 	 * @return An iterator containing the minimum spanning tree
 	 */
 	public Iterator<E> minimumSpanningTree() {
-		return null; //(CompKruskalEdge.kruskalsAlgorithm(this)).iterator();
+		return CompKruskalEdge.calculateMST(adjacencyList); //(CompKruskalEdge.kruskalsAlgorithm(this)).iterator();
 	}
 	
-	class ListNode {
+/*	class ListNode {
 		int destination;
 		double weight;
 		ListNode next;
@@ -72,6 +68,6 @@ public class DirectedGraph<E extends Edge> {
 		double getWeight() {
 			return weight;
 		}
-	}
+	}*/
 }
   
