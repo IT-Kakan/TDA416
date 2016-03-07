@@ -2,6 +2,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.PriorityQueue;
 
 
@@ -86,10 +87,10 @@ public class CompKruskalEdge {
 				}
 			}
 			connectedComponents[from].add(currentEdge);
-			System.out.println("from: " + from + " | " + "to: " + to);
+			/*System.out.println("from: " + from + " | " + "to: " + to);
 			for (int i = 0; i < numberOfNodes; i++) {
 				System.out.println(i + ": " + connectedComponents[i]);
-			}
+			}*/
 		}
 
 		//TODO: REMOVE
@@ -100,7 +101,7 @@ public class CompKruskalEdge {
 			}
 		}
 		//------------------
-		
+
 		return reference.listIterator();
 	}
 	
