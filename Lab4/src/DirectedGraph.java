@@ -39,7 +39,7 @@ public class DirectedGraph<E extends Edge> {
 	 * @return An iterator containing the minimum spanning tree
 	 */
 	public Iterator<E> minimumSpanningTree() {
-		return CompKruskalEdge.calculateMST(adjacencyList); //(CompKruskalEdge.kruskalsAlgorithm(this)).iterator();
+		return CompKruskalEdge.calculateMST(adjacencyList);
 	}
 	
 /*	class ListNode {
