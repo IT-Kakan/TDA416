@@ -295,11 +295,17 @@ public class ShortRoute extends JFrame implements ActionListener {
 				noderna.add(new BusStop(hpl, xco, yco));
 				names.add(hpl);
 				// Draw
+/*
+// Denna fix som slår ihop Kålltorp och Torp är förvirrande eftersom de är olika noder i grafen.
+// Tror man att det är samma nod blir resultatet förrvirrande.
+// Till nästa gång: Gör till samma nod med namnet Virginsgatan. Så är det i verkligheten nu.
+
 				// this is a fix: fixa att Kålltorp och Torp är samma hållplats
 				if ( hpl.equals("Torp") ) {
 					xco += 11;
 					hpl = "   / Torp";
 				}
+*/
 				karta.drawString(hpl, xco, yco,DrawGraph.Layer.BASE);
 			}
 			indata.close();
