@@ -41,33 +41,5 @@ public class DirectedGraph<E extends Edge> {
 	public Iterator<E> minimumSpanningTree() {
 		return CompKruskalEdge.calculateMST(adjacencyList);
 	}
-	
-/*	class ListNode {
-		int destination;
-		double weight;
-		ListNode next;
-		
-		private ListNode(int destination, double weight) {
-			this(destination, weight, null);
-		}
-		
-		private ListNode(int destination, double weight, ListNode next) {
-			this.destination = destination;
-			this.weight = weight;
-			this.next = next;
-		}
-		
-		private void setNext(ListNode newNext) {
-			this.next = newNext;
-		}
-		
-		ListNode getNext() {
-			return next;
-		}
-		
-		double getWeight() {
-			return weight;
-		}
-	}*/
 }
   

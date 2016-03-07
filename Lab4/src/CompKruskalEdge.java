@@ -3,55 +3,17 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.PriorityQueue;
-
 
 public class CompKruskalEdge {
 	
-	
-	/*public static <E extends DirectedGraph<Edge>.ListNode> Edge compareEdges(LinkedList<E> edges) {
-		
-		if (edges.isEmpty()) {
-			return null;
-		}
-		DirectedGraph<E>.ListNode current = edges.getFirst();
-		DirectedGraph<E>.ListNode minimumEdge = null;
-		double minimumWeight = Double.POSITIVE_INFINITY;
-		
-		while (current.getNext() != null) {
-			if (current.getWeight() < minimumWeight) {
-				minimumEdge = current;
-				minimumWeight = minimumEdge.getWeight();
-			}
-			current = current.getNext();
-		}
-		return minimumEdge;
-	}*/
-	
-	
+	/**
+	 * Calculates the minimum spanning tree of the graph with the specified adjacency list.
+	 * @param adjacencyList the adjacency list of the graph
+	 * @return an iterator containing the MST
+	 */
 	public static <E extends Edge> Iterator<E> calculateMST (List<E>[] adjacencyList) {
 		//Calculates a minimum spanning tree using an implementation of Kruskal's algorithm
-		/*
-		 * 0
-			skapa ett fält cc som för varje nod 
-			innehåller en egen tom lista (som skall
-			innehålla bågar så småningom)
-			(dvs varje nod är i en egen komponent)
-			
-			Lägg in alla bågar i en prioritetskö
-			Så länge pq, ej är tom && |cc| < n
-				hämta e = (from, to, weight) från kön
-				
-				om from och to inte refererar till samma lista i cc
-					flytta över alla elementen från den
-					kortare listan till den andra och se till 
-					att alla berörda noder i cc refererar 
-					till den påfyllda listan
-					
-				lägg slutligen e i den påfyllda listan
-		 */
-		
 		int numberOfNodes = adjacencyList.length;
 		
 		List<E>[] connectedComponents = initComponents(numberOfNodes);
@@ -70,18 +32,17 @@ public class CompKruskalEdge {
 			if (fromEdges != toEdges) {
 				if (fromEdges.size() <= toEdges.size()) {
 					transferEdges(fromEdges, toEdges);
-					
 					relink(connectedComponents, fromEdges, toEdges);
 				} else {
 					transferEdges(toEdges, fromEdges);
 					relink(connectedComponents, toEdges, fromEdges);
 				}
+				connectedComponents[from].add(currentEdge); //FEL!!!! Lägger ej till i toEdges
 			}
-			connectedComponents[from].add(currentEdge);
-			System.out.println("from: " + from + " | " + "to: " + to);
+			/*System.out.println("from: " + from + " | " + "to: " + to);
 			for (int i = 0; i < numberOfNodes; i++) {
 				System.out.println(i + ": " + connectedComponents[i]);
-			}
+			}*/
 		}
 
 		//TODO: REMOVE
@@ -108,18 +69,6 @@ public class CompKruskalEdge {
 		for (Integer i : index) {
 			connectedComponents[i] = newList;
 		}
-		
-		
-		
-		
-		/*
-		List<E> reference = component;
-		
-		for (int i = 0; i < connectedComponents.length; i++) {
-			if (reference == connectedComponents[i]) {
-				connectedComponents[i] = toEdges;
-			}
-		}*/
 	}
 
 	private static <E extends Edge> List<E>[] initComponents(int numberOfNodes) {

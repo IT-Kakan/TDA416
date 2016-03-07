@@ -7,24 +7,21 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 public class CompDijkstraPath {
-/*lägg (startnod, 0, tom väg) i en p-kö
-while kön inte är tom
-	(nod, cost, path) = första elementet i p-kön
-	if nod ej är besökt
-		if nod är slutpunkt returnera path
-		else 
-			markera nod besökt
-			for every v on EL(nod)
-				if v ej är besökt
-					lägg in nytt köelement för v i p-kön*/	
-	
+
+	/**
+	 * Calculates the shortest path between two nodes in a graph.
+	 * @param start the start node
+	 * @param end the end node
+	 * @param adjacencyList the adjacency list of the graph
+	 * @return an iterator containing the shortest path
+	 */
 	public static <E extends Edge> Iterator<E> calculateShortestPath(int start, int end, List<E>[] adjacencyList) {
 		boolean[] visitedNodes = new boolean[adjacencyList.length];
 		Set<E> visitedEdges = new HashSet<E>(); 
-		//Edges are stored differently due to unknown amount of edges
+		//Edges are stored differently due to unknown amount of edges required
 		
 		PriorityQueue<QueueElement<E>> queue = new PriorityQueue<>(new CostComparator<CompDijkstraPath.QueueElement<E>>());
-		queue.add(new QueueElement<E>(start, 0, new LinkedList<E>())); //TODO 0 is start node?
+		queue.add(new QueueElement<E>(start, 0, new LinkedList<E>()));
 		
 		while (!queue.isEmpty()) {
 			QueueElement<E> element = queue.poll();
@@ -52,10 +49,6 @@ while kön inte är tom
 	}
 	
 	private static class QueueElement<E extends Edge> {
-		/*Ett köelement skall innehålla (to, cost, path):
-		- noden man kommit till,
-		- kostnaden för vägen dit från startnoden och
-		- vägen dit från startpunkten */
 		
 		/* The node arrived at */
 		int node;
@@ -73,6 +66,9 @@ while kön inte är tom
 	
 	private static class CostComparator<T extends QueueElement<? extends Edge>> implements Comparator<T> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public int compare(T o1, T o2) {
 			if (o1.cost < o2.cost) {
