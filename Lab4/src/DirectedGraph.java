@@ -31,7 +31,7 @@ public class DirectedGraph<E extends Edge> {
 	 * @return An iterator containing the shortest path from the start node to the destination node. 
 	 */
 	public Iterator<E> shortestPath(int from, int to) {
-		return null;
+		return CompDijkstraPath.calculateShortestPath(from, to, adjacencyList);
 	}
 		
 	/**
