@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,29 +34,22 @@ public class CompKruskalEdge {
 		//Calculates a minimum spanning tree using an implementation of Kruskal's algorithm
 		/*
 		 * 0
-			skapa ett f√§lt cc som f√∂r varje nod 
-			inneh√•ller en egen tom lista (som skall
-			inneh√•lla b√•gar s√• sm√•ningom)
-			(dvs varje nod √§r i en egen komponent)
-			1
-			L√§gg in alla b√•gar i en prioritetsk√∂
-			2
-			S√• l√§nge pq, ej √§r tom && 
-			|cc| < n
-			3
-			h√§mta e = (from, to, 
-			weight
-			) fr√•n k√∂n
-			5
-			om from och to inte refererar till 
-			samma lista i cc
-			6
-			flytta √∂ver alla elementen fr√•n den
-			kortare listan till den andra och se till 
-			att alla ber√∂rda noder i cc refererar 
-			till den p√•fyllda listan
-			8
-			l√§gg slutligen e i den p√•fyllda listan
+			skapa ett f‰lt cc som fˆr varje nod 
+			innehÂller en egen tom lista (som skall
+			innehÂlla bÂgar sÂ smÂningom)
+			(dvs varje nod ‰r i en egen komponent)
+			
+			L‰gg in alla bÂgar i en prioritetskˆ
+			SÂ l‰nge pq, ej ‰r tom && |cc| < n
+				h‰mta e = (from, to, weight) frÂn kˆn
+				
+				om from och to inte refererar till samma lista i cc
+					flytta ˆver alla elementen frÂn den
+					kortare listan till den andra och se till 
+					att alla berˆrda noder i cc refererar 
+					till den pÂfyllda listan
+					
+				l‰gg slutligen e i den pÂfyllda listan
 		 */
 		
 		int numberOfNodes = adjacencyList.length;
@@ -77,42 +71,55 @@ public class CompKruskalEdge {
 				if (fromEdges.size() <= toEdges.size()) {
 					transferEdges(fromEdges, toEdges);
 					
-					relink(connectedComponents, connectedComponents[from], toEdges); //= (List<E>) toEdges;
-					
-					
-					
+					relink(connectedComponents, fromEdges, toEdges);
 				} else {
 					transferEdges(toEdges, fromEdges);
-					connectedComponents[to] = (List<E>) fromEdges;
+					relink(connectedComponents, toEdges, fromEdges);
 				}
 			}
 			connectedComponents[from].add(currentEdge);
-			/*System.out.println("from: " + from + " | " + "to: " + to);
+			System.out.println("from: " + from + " | " + "to: " + to);
 			for (int i = 0; i < numberOfNodes; i++) {
 				System.out.println(i + ": " + connectedComponents[i]);
-			}*/
+			}
 		}
 
 		//TODO: REMOVE
 		List<E> reference = connectedComponents[0];
-		for(List<E> edges: connectedComponents) {
+		/*for(List<E> edges: connectedComponents) {
 			if (edges != reference) {
 				throw new InternalError("Error in method kruskalsAlgorithm(): not all components references the same list.");
 			}
 		}
 		//------------------
-
+*/
 		return reference.listIterator();
 	}
 	
-	private static<E extends Edge> void relink(List<E>[] connectedComponents, List<E> component, List<E> toEdges) {
+	private static<E extends Edge> void relink(List<E>[] connectedComponents, List<E> oldList, List<E> newList) {
+		List<Integer> index = new ArrayList<>();
+		
+		for (int i = 0; i < connectedComponents.length; i++) {
+			if (oldList == connectedComponents[i]) {
+				index.add(i);
+			}
+		}
+		
+		for (Integer i : index) {
+			connectedComponents[i] = newList;
+		}
+		
+		
+		
+		
+		/*
 		List<E> reference = component;
 		
 		for (int i = 0; i < connectedComponents.length; i++) {
 			if (reference == connectedComponents[i]) {
 				connectedComponents[i] = toEdges;
 			}
-		}
+		}*/
 	}
 
 	private static <E extends Edge> List<E>[] initComponents(int numberOfNodes) {
@@ -138,7 +145,7 @@ public class CompKruskalEdge {
 				}
 			}
 		}
-		return currentLargest < value;
+		return currentLargest < value-1;
 	}
 
 	/**
