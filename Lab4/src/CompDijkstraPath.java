@@ -17,8 +17,6 @@ public class CompDijkstraPath {
 	 */
 	public static <E extends Edge> Iterator<E> calculateShortestPath(int start, int end, List<E>[] adjacencyList) {
 		boolean[] visitedNodes = new boolean[adjacencyList.length];
-		Set<E> visitedEdges = new HashSet<E>(); 
-		//Edges are stored differently due to unknown amount of edges required
 		
 		PriorityQueue<QueueElement<E>> queue = new PriorityQueue<>(new CostComparator<CompDijkstraPath.QueueElement<E>>());
 		queue.add(new QueueElement<E>(start, 0, new LinkedList<E>()));
@@ -32,9 +30,7 @@ public class CompDijkstraPath {
 					visitedNodes[element.node] = true;
 					
 					for (E edge : adjacencyList[element.node]) {
-						if (!visitedEdges.contains(edge)) {
-							visitedEdges.add(edge);
-							
+						if (!visitedNodes[edge.to]) {				
 							int node = edge.to;
 							double cost = element.cost + edge.getWeight();
 							LinkedList<E> path = (LinkedList<E>)element.path.clone();
