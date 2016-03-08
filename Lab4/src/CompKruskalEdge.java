@@ -37,23 +37,11 @@ public class CompKruskalEdge {
 					transferEdges(toEdges, fromEdges);
 					relink(connectedComponents, toEdges, fromEdges);
 				}
-				connectedComponents[from].add(currentEdge); //FEL!!!! Lägger ej till i toEdges
+				connectedComponents[from].add(currentEdge);
 			}
-			/*System.out.println("from: " + from + " | " + "to: " + to);
-			for (int i = 0; i < numberOfNodes; i++) {
-				System.out.println(i + ": " + connectedComponents[i]);
-			}*/
 		}
 
-		//TODO: REMOVE
 		List<E> reference = connectedComponents[0];
-		/*for(List<E> edges: connectedComponents) {
-			if (edges != reference) {
-				throw new InternalError("Error in method kruskalsAlgorithm(): not all components references the same list.");
-			}
-		}
-		//------------------
-*/
 		return reference.listIterator();
 	}
 	
